@@ -1,2 +1,6 @@
-# web-420
-Repository for Bellevue University's RESTFul APIs Class Assignments
+# WEB 420 RESTful APIs
+
+## Contributors
+
+- Richard Krasso
+- Jamal Damir
