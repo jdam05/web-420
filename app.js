@@ -14,6 +14,7 @@ const mongoose = require("mongoose");
 const http = require("http");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
+const composerAPI = require("./routes/damir-composer-routes");
 
 // Initializing express app
 const app = express();
@@ -27,20 +28,41 @@ app.use(express.json());
 // Setting app to use express.urlencoded()
 app.use(express.urlencoded({ extended: true }));
 
+// Connecting to MongoDB Atlas
+const conn =
+	"mongodb+srv://web420_user:s3cret@bellevueuniversity.5vradwb.mongodb.net/web420DB";
+mongoose
+	.connect(conn, {
+		promiseLibrary: require("bluebird"),
+		useUnifiedTopology: true,
+		useNewUrlParser: true,
+	})
+	.then(() => {
+		console.log(`Connection to web420DB on MongoDB Atlas successful`);
+	})
+	.catch((err) => {
+		console.log(`MongoDB Error: ${err.message}`);
+	});
+
+// Swagger Related info
 const options = {
 	definition: {
 		openapi: "3.0.0",
 		info: {
-			title: "WEB 420 RESTFul APIs",
+			title: "WEB 420 RESTful APIs",
 			version: "1.0.0",
 		},
 	},
-	apis: ["./routes/*.js"],
+	apis: ["./routes/*.js"], // files containing annotations for the OpenAPI Specification
 };
 
+// OpenAPI Specification
 const openapiSpecification = swaggerJsdoc(options);
 
+// Setting up SwaggerUI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapiSpecification));
+// Setting up composerAPI middleware
+app.use("/api", composerAPI);
 
 // Creating server listening on port 3000
 http.createServer(app).listen(app.get("port"), function () {
