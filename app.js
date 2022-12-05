@@ -17,6 +17,7 @@ const swaggerJsdoc = require("swagger-jsdoc");
 const composerAPI = require("./routes/damir-composer-routes");
 const personAPI = require("./routes/damir-person-routes");
 const userAPI = require("./routes/damir-session-routes");
+const customerAPI = require("./routes/damir-node-shopper-routes");
 
 // Initializing express app
 const app = express();
@@ -71,6 +72,9 @@ app.use("/api", personAPI);
 
 // Setting up userAPI middleware
 app.use("/api", userAPI);
+
+// Setting up customerAPI middleware
+app.use("/api", customerAPI);
 
 // Creating server listening on port 3000
 http.createServer(app).listen(app.get("port"), function () {
