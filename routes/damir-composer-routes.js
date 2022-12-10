@@ -58,6 +58,7 @@ router.get("/composers", async (req, res) => {
  *    get:
  *     tags:
  *       - Composers
+ *     name: findComposerById
  *     description: API for returning a single composer object from MongoDB
  *     summary: returns a composer document
  *     parameters:
@@ -67,13 +68,13 @@ router.get("/composers", async (req, res) => {
  *         description: The composerId requested by the user
  *         schema:
  *           type: string
- *    responses:
- *      "200":
- *        description: Composer document is JSON format
- *      "500":
- *        description: Server Exception
- *      "501":
- *        description: MongoDB Exception
+ *     responses:
+ *       "200":
+ *         description: Composer document is JSON format
+ *       "500":
+ *         description: Server Exception
+ *       "501":
+ *         description: MongoDB Exception
  */
 router.get("/composers/:id", async (req, res) => {
 	try {
@@ -135,6 +136,134 @@ router.post("/composers", async (req, res) => {
 		};
 
 		await Composer.create(newComposer, function (err, composer) {
+			if (err) {
+				console.log(err);
+				res.status(501).send({
+					message: `MongoDB Exception: ${err}`,
+				});
+			} else {
+				console.log(composer);
+				res.json(composer);
+			}
+		});
+	} catch (e) {
+		console.log(e);
+		res.status(500).send({
+			message: `Server Exception: ${e.message}`,
+		});
+	}
+});
+
+/**
+ * updateComposerById
+ * @openapi
+ * /api/composers/{id}:
+ *   put:
+ *     tags:
+ *       - Composers
+ *     name: updateComposerById
+ *     description: API for updating composer object by ID
+ *     summary: Updates a composer document
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ComposerId to be updated
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       description: Composer Information
+ *       content:
+ *         application/json:
+ *           schema:
+ *             required:
+ *               - firstName
+ *               - lastName
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *     responses:
+ *       "200":
+ *         description: Composer document
+ *       "500":
+ *         description: Server Exception
+ *       "501":
+ *         description: MongoDB Exception
+ */
+
+router.put("/composers/:id", async (req, res) => {
+	try {
+		// prettier-ignore
+		Composer.findOne({"_id": req.params.id}, function (err, composer) {
+			if (err) {
+				console.log(err);
+				res.status(501).send({
+					message: `MongoDB Exception: ${err}`,
+				});
+			} else {
+				if (composer) {
+					composer.set({
+						firstName: req.body.firstName,
+						lastName: req.body.lastName
+					})
+					composer.save(function (err, savedComposer) {
+						if (err) {
+							console.log(err);
+						} else {
+							console.log(savedComposer);
+							res.json(savedComposer);
+						}
+					});
+				} else if (!composer) {
+					console.log("There are no composers with the entered ID");
+					res.status(401).send({
+						message: `Invalid composerId`,
+					});
+				} else {
+
+				}
+			}
+		});
+	} catch (e) {
+		console.log(e);
+		res.status(500).send({
+			message: `Server Exception: ${e.message}`,
+		});
+	}
+});
+
+/**
+ * deleteComposerById
+ * @openapi
+ * /api/composers/{id}:
+ *   delete:
+ *     tags:
+ *       - Composers
+ *     name: deleteComposerById
+ *     description: API for deleting composer object from MongoDB
+ *     summary: Deletes a composer document
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The composerId to be deleted
+ *         schema:
+ *           type: string
+ *     responses:
+ *       "200":
+ *         description: composer document
+ *       "500":
+ *         description: Server Exception
+ *       "501":
+ *         description: MongoDB Exception
+ */
+
+router.delete("/composers/:id", async (req, res) => {
+	try {
+		// prettier-ignore
+		await Composer.findOneAndDelete({"_id": req.params.id}, function (err, composer) {
 			if (err) {
 				console.log(err);
 				res.status(501).send({
