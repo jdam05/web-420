@@ -18,6 +18,7 @@ const composerAPI = require("./routes/damir-composer-routes");
 const personAPI = require("./routes/damir-person-routes");
 const userAPI = require("./routes/damir-session-routes");
 const customerAPI = require("./routes/damir-node-shopper-routes");
+const teamAPI = require("./routes/damir-team-routes");
 
 // Initializing express app
 const app = express();
@@ -75,6 +76,13 @@ app.use("/api", userAPI);
 
 // Setting up customerAPI middleware
 app.use("/api", customerAPI);
+
+// Setting up teamAPI middleware
+app.use("/api", teamAPI);
+// Redirecting invalid route to api-docs
+app.get("*", (req, res) => {
+	res.redirect("https://damir-capstone-api.onrender.com/api-docs");
+});
 
 // Creating server listening on port 3000
 http.createServer(app).listen(app.get("port"), function () {
