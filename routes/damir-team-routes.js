@@ -159,15 +159,15 @@ router.post("/teams/:id/players", async (req, res) => {
 router.get("/teams/:id/players", async (req, res) => {
 	try {
 		// prettier-ignore
-		Team.findOne({"_id": req.params.id}, function (err, player) {
+		Team.findOne({"_id": req.params.id}, function (err, team) {
 			if (err) {
 				console.log(err);
 				res.status(501).send({
 					message: `MongoDB Exception: ${err}`,
 				});
 			} else {
-				console.log(player);
-				res.json(player);
+				console.log(team.players);
+				res.json(team.players);
 			}
 		});
 	} catch (e) {
